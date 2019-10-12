@@ -1,0 +1,48 @@
+version: 2.1
+
+orbs:
+  gcp-cli: circleci/gcp-cli@1.8.2
+  gcp-gke: circleci/gcp-gke@0.2.0
+
+jobs:
+  build:
+    description: Build and push service docker image
+    machine: true
+    steps:
+      # Install `gcloud`
+      - gcp-cli/install
+      - checkout
+
+      # output variables for visibility
+      - run:
+          command: |
+            echo "CIRCLE_BRANCH=$CIRCLE_BRANCH"
+            echo "CIRCLE_JOB=$CIRCLE_JOB"
+            echo "CIRCLE_PROJECT_REPONAME=$CIRCLE_PROJECT_REPONAME"
+            echo "CIRCLE_PROJECT_USERNAME=$CIRCLE_PROJECT_USERNAME"
+            echo "CIRCLE_REPOSITORY_URL=$CIRCLE_REPOSITORY_URL"
+            echo "CIRCLE_USERNAME=$CIRCLE_USERNAME"
+            echo "CIRCLE_SHA1=$CIRCLE_SHA1"
+
+      - run:
+          command: |
+            echo Authenticating...
+            echo ${WORKSHOP_CI_ACCOUNT_TOKEN_BASE64} | base64 --decode > .WORKSHOP_CI_ACCOUNT_TOKEN.json
+            gcloud auth activate-service-account ${WORKSHOP_CI_USER} --key-file=.WORKSHOP_CI_ACCOUNT_TOKEN.json >/dev/null 2>&1
+            gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://gcr.io >/dev/null 2>&1
+
+            set -x
+            image=gcr.io/unity-ads-workshop-test/rasmus-nodejs-docker-webapp
+
+            docker build -t ${image}:${CIRCLE_SHA1} .
+            docker push ${image}:${CIRCLE_SHA1}
+
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker tag ${image}:${CIRCLE_SHA1} ${image}:master
+              docker push ${image}:master
+            fi
+
+workflows:
+  build_update_deploy:
+    jobs:
+      - build
