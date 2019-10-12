@@ -71,7 +71,7 @@ jobs:
             # patch to force Kubernetes to "refresh" deployment, see https://github.com/kubernetes/kubernetes/issues/27081#issuecomment-238078103
             kubectl patch deployment -n ${namespace} ${service} -p  "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
 
-            kubectl expose deployment -n ${namespace} ${service} --type=LoadBalancer --name=${service}-lb --port=80s --targetPort=3000
+            kubectl expose deployment -n ${namespace} ${service} --type=LoadBalancer --name=${service}-lb --port=80s --target-port=3000
             kubectl get all -n ${namespace} | grep ${service}
             kubectl describe -n ${namespace} service/${service}-lb || true
 
