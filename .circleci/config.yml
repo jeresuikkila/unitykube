@@ -42,7 +42,43 @@ jobs:
               docker push ${image}:master
             fi
 
+  deploy:
+    description: Deploy service to Google Kubernetes Engine
+    machine: true
+    steps:
+      # Install `gcloud` and `kubectl`
+      - gcp-gke/install
+      - checkout
+
+      - run:
+          command: |
+            echo Authenticating...
+            echo ${WORKSHOP_CI_ACCOUNT_TOKEN_BASE64} | base64 --decode > .WORKSHOP_CI_ACCOUNT_TOKEN.json
+            gcloud auth activate-service-account ${WORKSHOP_CI_USER} --key-file=.WORKSHOP_CI_ACCOUNT_TOKEN.json >/dev/null 2>&1
+
+            set -x
+            gcloud container clusters get-credentials ${WORKSHOP_CLUSTER} --zone ${WORKSHOP_CLUSTER_ZONE} --project ${WORKSHOP_GCP_PROJECT}
+            kubectl config current-context
+
+            service=rasmus-nodejs-docker-webapp
+            namespace=workshop
+
+            if kubectl get service ${service}-lb -n ${namespace} > /dev/null; then
+              kubectl delete service ${service}-lb -n ${namespace};
+            fi
+            kubectl apply -f ./manifests/service.yaml -f ./manifests/deployment.yaml
+            kubectl expose deployment -n ${namespace} ${service} --type=LoadBalancer --name=${service}-lb --port=8080
+            kubectl get all -n ${namespace} | grep ${service}
+            kubectl describe -n ${namespace} service/${service}-lb || true
+
 workflows:
   build_update_deploy:
     jobs:
       - build
+      - deploy:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - build
