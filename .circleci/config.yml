@@ -67,6 +67,10 @@ jobs:
               kubectl delete service ${service}-lb -n ${namespace};
             fi
             kubectl apply -f ./manifests/service.yaml -f ./manifests/deployment.yaml
+
+            # patch to force Kubernetes to "refresh" deployment, see https://github.com/kubernetes/kubernetes/issues/27081#issuecomment-238078103
+            kubectl patch deployment -n ${namespace} ${service} -p  "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+
             kubectl expose deployment -n ${namespace} ${service} --type=LoadBalancer --name=${service}-lb --port=8080
             kubectl get all -n ${namespace} | grep ${service}
             kubectl describe -n ${namespace} service/${service}-lb || true

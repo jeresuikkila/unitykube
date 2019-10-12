@@ -30,6 +30,9 @@ spec:
             limits:
               cpu: 0.5
               memory: 1024Mi
+          env:
+            - name: SOME_ENV_VARIABLE
+              value: some env value
 
       nodeSelector:
         cloud.google.com/gke-nodepool: workshop-pool
