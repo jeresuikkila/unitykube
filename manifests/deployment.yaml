@@ -30,9 +30,6 @@ spec:
             limits:
               cpu: 0.5
               memory: 1024Mi
-          env:
-            - name: PORT
-              value: 3000
 
       nodeSelector:
         cloud.google.com/gke-nodepool: workshop-pool
