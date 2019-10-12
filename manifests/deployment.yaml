@@ -2,16 +2,16 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   namespace: workshop
-  name: rasmus-nodejs-docker-webapp
+  name: jere-unitykube
   labels:
-    app: rasmus-nodejs-docker-webapp
+    app: jere-unitykube
 
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
   selector:
     matchLabels:
-      app: rasmus-nodejs-docker-webapp
+      app: jere-unitykube
 
   template:
     metadata:
