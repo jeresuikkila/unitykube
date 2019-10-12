@@ -6,10 +6,7 @@ RUN ["npm", "install"]
 COPY . .
 EXPOSE 3000
 
-ARG TEST_VAL=defaultValue
-
-RUN echo "${TEST_VAL}" >> .test
-
-RUN cat .test
+ARG SERVICE_NAME
+ENV SERVICE_NAME=$SERVICE_NAME
 
 ENTRYPOINT [ "node", "index.js" ]

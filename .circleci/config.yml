@@ -34,7 +34,7 @@ jobs:
             set -x
             image=gcr.io/unity-ads-workshop-test/jere-unitykube
 
-            docker build --build-arg TEST_VAL=${TEST_VAL} -t ${image}:${CIRCLE_SHA1} .
+            docker build --build-arg SERVICE_NAME=${SERVICE_NAME} -t ${image}:${CIRCLE_SHA1} .
             docker push ${image}:${CIRCLE_SHA1}
 
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
