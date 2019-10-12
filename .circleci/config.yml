@@ -60,7 +60,7 @@ jobs:
             gcloud container clusters get-credentials ${WORKSHOP_CLUSTER} --zone ${WORKSHOP_CLUSTER_ZONE} --project ${WORKSHOP_GCP_PROJECT}
             kubectl config current-context
 
-            service=rasmus-nodejs-docker-webapp
+            service=jere-unitykube
             namespace=workshop
 
             if kubectl get service ${service}-lb -n ${namespace} > /dev/null; then
