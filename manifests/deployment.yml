@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: workshop
+  name: rasmus-nodejs-docker-webapp
+  labels:
+    app: rasmus-nodejs-docker-webapp
+
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rasmus-nodejs-docker-webapp
+
+  template:
+    metadata:
+      labels:
+        app: jere-unitykube
+      annotations:
+    spec:
+      containers:
+        - image: gcr.io/unity-ads-workshop-test/jere-unitykube:master
+          name: jere-unitykube
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 0.1
+              memory: 128Mi
+            limits:
+              cpu: 0.5
+              memory: 1024Mi
+          env:
+            - name: PORT
+              value: 3000
+
+      nodeSelector:
+        cloud.google.com/gke-nodepool: workshop-pool
